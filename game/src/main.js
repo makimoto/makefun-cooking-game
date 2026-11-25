@@ -12,6 +12,7 @@ import { sfx } from './audio.js';
 
 const params = new URLSearchParams(location.search);
 const shotName = params.get('shot');
+if (shotName) document.body.dataset.shot = shotName;
 const seed = Number(params.get('seed') || 1);
 
 let state = shotName
@@ -68,6 +69,7 @@ document.getElementById('noodle-btn').addEventListener('click', handlers.onNoodl
 document.getElementById('serve-btn').addEventListener('click', handlers.onServe);
 
 function beginShift() {
+  delete document.body.dataset.shot;
   state = createShiftState(createSeededRng((Math.random() * 1e9) | 0));
   startShift(state);
   hideOverlay();
@@ -77,7 +79,7 @@ document.getElementById('start-btn').addEventListener('click', beginShift);
 document.getElementById('overlay-btn').addEventListener('click', beginShift);
 
 if (shotName === 'end') {
-  showOverlay('🌙 SHIFT OVER', `${shotEndSummary(state)}\n\nThe stall lantern dims — thanks for feeding the night.`, 'PLAY AGAIN');
+  showOverlay('🌙 SHIFT OVER', shotEndSummary(state), 'PLAY AGAIN', true);
 } else if (!shotName) {
   showOverlay('🍜 UMAMI RUSH — Midnight Ramen Stand',
     'Ninety seconds, one steaming pot, a board full of hungry night owls.\nMatch each ticket: broth, noodle doneness, every topping.\nPull the noodles inside the ticket\'s zone — perfect bowls build your combo.',
@@ -96,8 +98,8 @@ function frame(now) {
       onWalkout() { sfx.walkout(); },
       onShiftEnd() {
         showOverlay('🌙 SHIFT OVER',
-          `Bowls served: ${state.servedCount} · Perfect bowls: ${state.perfectCount}\nWalked out hungry: ${state.walkedOut} · Final score: ${state.score}`,
-          'PLAY AGAIN');
+          shotEndSummary(state),
+          'PLAY AGAIN', true);
       },
     });
     renderGame(state);

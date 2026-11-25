@@ -24,16 +24,15 @@ export function buildCounterButtons(handlers) {
   }
 }
 
-function ticketHtml(order, isSelected) {
+function ticketHtml(order) {
   const broth = brothById(order.broth);
   const items = [
-    `<li>🍜 ${broth.jp} ${broth.name} broth</li>`,
-    `<li>⏱ Noodles: ${order.doneness.toUpperCase()}</li>`,
     ...order.toppings.map((t) => `<li>＋ ${toppingById(t).name}</li>`),
   ].join('');
   const pct = Math.max(0, Math.round((order.patienceLeft / order.patience) * 100));
   return `<h4><span>#${order.number} ${order.customer}</span><span>${Math.ceil(order.patienceLeft)}s</span></h4>
-    <div class="cust">wants a bowl of ramen:</div><ul>${items}</ul>
+    <div class="ticket-order ticket-${broth.id}"><strong>${broth.name}</strong><span>Noodles: ${order.doneness.toUpperCase()}</span></div>
+    <ul>${items}</ul>
     <div class="patience"><div style="width:${pct}%"></div></div>`;
 }
 
@@ -112,7 +111,12 @@ export function renderGame(state) {
   if (pass.dataset.key !== passKey) {
     pass.dataset.key = passKey;
     pass.innerHTML = state.kitchen.pass.map((p) =>
-      `<div class="pass-bowl"><div class="mini-bowl"><div class="mini-broth" style="background:${brothById(p.broth).color}"></div></div>✔ READY<br>${p.label}</div>`).join('')
+      `<div class="pass-bowl">
+        <div class="mini-bowl" aria-hidden="true"><span class="mini-steam"></span>
+          <div class="mini-broth" style="background-color:${brothById(p.broth).color}"></div>
+        </div>
+        <span>${p.label}</span>
+      </div>`).join('')
       || '<div style="color:#8a7a55;font-size:12px;font-weight:700">Served bowls appear here, steaming.</div>';
   }
 
@@ -128,10 +132,11 @@ export function renderGame(state) {
   fb.className = state.feedbackKind || '';
 }
 
-export function showOverlay(title, text, buttonLabel) {
+export function showOverlay(title, text, buttonLabel, isResults = false) {
   el('overlay-title').textContent = title;
   el('overlay-text').textContent = text;
   el('overlay-btn').textContent = buttonLabel;
+  el('overlay').classList.toggle('results', isResults);
   el('overlay').classList.remove('hidden');
 }
 export function hideOverlay() { el('overlay').classList.add('hidden'); }

@@ -41,7 +41,7 @@ export function elapsedRatio(state) {
   return Math.min(1, state.elapsed / SHIFT_SECONDS);
 }
 
-function addOrder(state) {
+export function addOrder(state) {
   const order = createOrder(state.rng, elapsedRatio(state));
   order.customer = CUSTOMER_NAMES[Math.floor(state.rng() * CUSTOMER_NAMES.length)];
   state.orders.push(order);
