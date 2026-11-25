@@ -12,7 +12,15 @@
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+// Umami Rush — Midnight Ramen Stand: the game in game/ is a 90-second ramen
+// cooking game (order tickets, a boil-timing pot, a plating counter and a pass
+// shelf). The hand-in below is the kit's, plus a closing self-audit of ours:
+// after the dossier is written we re-read the output and refuse to hand in a
+// broken stall — a missing game page, the wrong number of screenshots, or a
+// screenshot over the gate's size cap all stop the run loudly instead of
+// silently scoring zero.
+
+import { cpSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-game.ts';
@@ -39,3 +47,29 @@ writeFileSync(
     game_path_max_bytes: 1000,
   }),
 );
+
+// Closing self-audit (ours, not the kit's): the hand-in is only trustworthy
+// if the output really holds the playable game and its screenshots.
+function auditHandIn(outputDir) {
+  const problems = [];
+  if (!existsSync(join(outputDir, 'game', 'index.html'))) {
+    problems.push('game/index.html is missing from the output');
+  }
+  const shotsDir = join(outputDir, 'screenshots');
+  const shots = existsSync(shotsDir)
+    ? readdirSync(shotsDir).filter((name) => /\.(png|jpe?g)$/i.test(name))
+    : [];
+  if (shots.length < 3 || shots.length > 4) {
+    problems.push(`expected 3 or 4 screenshots, found ${shots.length}`);
+  }
+  for (const name of shots) {
+    const bytes = statSync(join(shotsDir, name)).size;
+    if (bytes > 262144) problems.push(`screenshot ${name} is ${bytes} bytes, over the 256 KiB cap`);
+  }
+  if (problems.length > 0) {
+    throw new Error(`Umami Rush hand-in audit failed: ${problems.join('; ')}`);
+  }
+  console.log(`Umami Rush hand-in audit: game page present, ${shots.length} screenshots within caps.`);
+}
+
+auditHandIn(out);
