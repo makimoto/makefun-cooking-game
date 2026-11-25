@@ -75,22 +75,28 @@ export function tickShift(state, dt, hooks) {
     return;
   }
   state.spawnTimer -= dt;
+  const walked = tickOrderPatience(state.orders, dt);
+  if (walked.length) {
+    state.orders = state.orders.filter((order) => !walked.includes(order));
+    state.walkedOut += walked.length;
+    state.combo = 0;
+  }
   if (state.spawnTimer <= 0 && state.orders.length < 3) {
     addOrder(state);
     state.spawnTimer = spawnIntervalSeconds(elapsedRatio(state));
     hooks.onNewOrder?.();
   }
-  const walked = tickOrderPatience(state.orders, dt);
-  for (const order of walked) {
-    state.orders = state.orders.filter((o) => o !== order);
-    state.walkedOut += 1;
-    state.combo = 0;
-    state.feedback = `Ticket #${order.number} walked out hungry… combo lost.`;
+  if (walked.length) {
+    const lostTarget = walked.find((order) => order.number === state.selectedOrderNumber);
+    state.feedback = `Ticket #${(lostTarget || walked[0]).number} walked out hungry… combo lost.`;
     state.feedbackKind = 'bad';
-    if (state.selectedOrderNumber === order.number) {
+    if (lostTarget) {
       state.selectedOrderNumber = state.orders[0]?.number ?? null;
+      state.feedback += state.selectedOrderNumber === null
+        ? ' Waiting for a new ticket.'
+        : ` Now targeting #${state.selectedOrderNumber}.`;
     }
-    hooks.onWalkout?.(order);
+    for (const order of walked) hooks.onWalkout?.(order);
   }
 }
 

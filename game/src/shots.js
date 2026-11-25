@@ -30,11 +30,11 @@ export function buildShotScene(name, seed) {
     ];
     addOrder(state);
     state.orders.forEach((order, index) => { order.number = 5 + index; });
-    Object.assign(target, { broth: 'shoyu', toppings: ['chashu', 'ajitama', 'negi', 'nori'] });
+    Object.assign(target, { broth: 'shoyu', doneness: 'firm', toppings: ['chashu', 'ajitama', 'negi', 'nori'] });
     target.patienceLeft = 24;
     state.orders[1].patienceLeft = 8;
     plateTicket(state, target, 3);
-    state.kitchen.potProgress = 0.37; // needle centred in the target's FIRM zone: pull moment is next
+    state.kitchen.potProgress = 0.375;
     state.feedback = 'One topping to go — then ring the bell!';
     state.feedbackKind = 'good';
   }

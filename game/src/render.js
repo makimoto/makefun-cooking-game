@@ -26,9 +26,10 @@ export function buildCounterButtons(handlers) {
 
 function ticketHtml(order) {
   const broth = brothById(order.broth);
-  const items = [
-    ...order.toppings.map((t) => `<li>＋ ${toppingById(t).name}</li>`),
-  ].join('');
+  const items = order.toppings.map((id) => {
+    const topping = toppingById(id);
+    return `<li><span class="chip top-${id}" aria-hidden="true">${topping.short}</span>${topping.name}</li>`;
+  }).join('');
   const pct = Math.max(0, Math.round((order.patienceLeft / order.patience) * 100));
   return `<h4><span>#${order.number} ${order.customer}</span><span>${Math.ceil(order.patienceLeft)}s</span></h4>
     <div class="ticket-order ticket-${broth.id}"><strong>${broth.name}</strong><span>Noodles: ${order.doneness.toUpperCase()}</span></div>
@@ -66,6 +67,7 @@ export function renderGame(state) {
   const target = selectedOrder(state);
   el('target-name').textContent = target ? `#${target.number} ${brothById(target.broth).name} / ${target.doneness}` : '—';
   const bowl = state.kitchen.bowl;
+  el('serve-btn').classList.toggle('unready', !target || !bowl?.broth || !bowl.noodleDoneness);
   const brothLayer = el('broth');
   brothLayer.className = bowl?.broth ? bowl.broth : '';
   el('noodle-layer').className = bowl?.noodleDoneness ? 'on' : '';
