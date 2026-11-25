@@ -70,6 +70,7 @@ export function renderGame(state) {
   el('serve-btn').classList.toggle('unready', !target || !bowl?.broth || !bowl.noodleDoneness);
   const brothLayer = el('broth');
   brothLayer.className = bowl?.broth ? bowl.broth : '';
+  el('bowl-steam').className = bowl?.broth ? 'on' : '';
   el('noodle-layer').className = bowl?.noodleDoneness ? 'on' : '';
   const layer = el('topping-layer');
   const toppingKey = bowl ? bowl.toppings.join(',') : '';
