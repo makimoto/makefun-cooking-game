@@ -9,12 +9,19 @@ export function bindTicketClicks(onSelect) {
   });
 }
 
+export function blurButtonsAfterClick() {
+  document.addEventListener('click', (event) => {
+    const btn = event.target.closest('button');
+    if (btn) btn.blur();
+  });
+}
+
 export function bindKeyboard(handlers) {
   window.addEventListener('keydown', (event) => {
     if (event.repeat) return;
     const key = event.key.toLowerCase();
     if (key === ' ') { event.preventDefault(); handlers.onNoodleAction(); return; }
-    if (key === 'enter') { handlers.onServe(); return; }
+    if (key === 'enter') { event.preventDefault(); handlers.onServe(); return; }
     if (key === 'b') { handlers.onNewBowl(); return; }
     if (key === 't') { handlers.onTrash(); return; }
     if (['1', '2', '3'].includes(key)) { handlers.onSelectIndex(Number(key) - 1); return; }

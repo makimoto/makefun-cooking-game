@@ -32,7 +32,7 @@ export function buildShotScene(name, seed) {
     if (state.orders[1]) state.orders[1].patienceLeft = state.orders[1].patience * 0.3;
     state.feedback = name === 'cover'
       ? 'One topping to go — then ring the bell!'
-      : 'PERFECT BOWL! +412 — the customer slurps happily.';
+      : 'Combo is hot — finish this bowl, keep the line moving!';
     state.feedbackKind = 'good';
   }
 
@@ -57,6 +57,7 @@ export function buildShotScene(name, seed) {
     state.timeLeft = 0; state.elapsed = 90; state.over = true;
     state.score = 3480; state.combo = 0; state.servedCount = 11; state.perfectCount = 7;
     state.walkedOut = 2;
+    state.orders = []; state.selectedOrderNumber = null;
     state.kitchen.pass = [{ label: '#11 shoyu', broth: 'shoyu' }, { label: '#12 miso', broth: 'miso' }];
     state.feedback = 'Last train gone. The night owls are fed.';
   }

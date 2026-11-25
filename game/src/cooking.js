@@ -61,9 +61,14 @@ export function scoreServedBowl(bowl, order, combo) {
   if (bowl.broth === order.broth) earned += 60; else problems.push(bowl.broth ? 'wrong broth' : 'no broth');
   if (bowl.noodleDoneness === order.doneness) earned += 60;
   else problems.push(bowl.noodleDoneness ? `noodles ${bowl.noodleDoneness}` : 'no noodles');
-  const wanted = new Set(order.toppings);
   const missing = order.toppings.filter((t) => !bowl.toppings.includes(t));
-  const extras = bowl.toppings.filter((t) => !wanted.has(t));
+  const wantedCounts = {};
+  for (const t of order.toppings) wantedCounts[t] = (wantedCounts[t] || 0) + 1;
+  const extras = [];
+  for (const t of bowl.toppings) {
+    if (wantedCounts[t] > 0) wantedCounts[t] -= 1;
+    else extras.push(t);
+  }
   earned += (order.toppings.length - missing.length) * 22;
   if (missing.length) problems.push(`missing ${missing.join(', ')}`);
   if (extras.length) { earned -= extras.length * 18; problems.push(`extra ${extras.join(', ')}`); }

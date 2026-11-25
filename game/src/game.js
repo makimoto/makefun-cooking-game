@@ -98,6 +98,11 @@ export function tickShift(state, dt, hooks) {
 export function serveCurrentBowl(state) {
   const order = selectedOrder(state);
   if (!order || !state.kitchen.bowl) return null;
+  if (!state.kitchen.bowl.broth || !state.kitchen.bowl.noodleDoneness) {
+    state.feedback = 'That bowl is not food yet — it needs broth and noodles before it can be served.';
+    state.feedbackKind = 'bad';
+    return null;
+  }
   const result = scoreServedBowl(state.kitchen.bowl, order, state.combo);
   state.score += result.points;
   state.servedCount += 1;
@@ -107,7 +112,7 @@ export function serveCurrentBowl(state) {
   state.feedback = result.verdict;
   state.feedbackKind = result.perfect ? 'good' : '';
   state.lastServe = { order, result };
-  state.kitchen.pass.push({ label: `#${order.number} ${order.broth}`, broth: order.broth });
+  state.kitchen.pass.push({ label: `#${order.number} ${state.kitchen.bowl.broth}`, broth: state.kitchen.bowl.broth });
   if (state.kitchen.pass.length > 3) state.kitchen.pass.shift();
   state.kitchen.bowl = null;
   state.orders = state.orders.filter((o) => o !== order);

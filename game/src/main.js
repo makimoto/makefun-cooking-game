@@ -6,7 +6,7 @@ import {
   dropNoodlesInPot, pullNoodlesFromPot, tickPot,
 } from './cooking.js';
 import { buildCounterButtons, renderGame, showOverlay, hideOverlay } from './render.js';
-import { bindKeyboard, bindTicketClicks } from './input.js';
+import { bindKeyboard, bindTicketClicks, blurButtonsAfterClick } from './input.js';
 import { buildShotScene, shotEndSummary } from './shots.js';
 import { sfx } from './audio.js';
 
@@ -47,6 +47,7 @@ const handlers = {
     renderGame(state);
   },
   onServe() {
+    if (!state.running) { renderGame(state); return; }
     const result = serveCurrentBowl(state);
     if (result) { sfx.serveBell(); if (result.perfect) setTimeout(() => sfx.perfect(), 150); }
     renderGame(state);
@@ -58,6 +59,7 @@ const handlers = {
 };
 
 buildCounterButtons(handlers);
+blurButtonsAfterClick();
 bindTicketClicks((number) => { selectOrder(state, number); sfx.click(); renderGame(state); });
 bindKeyboard(handlers);
 document.getElementById('bowl-btn').addEventListener('click', handlers.onNewBowl);
@@ -86,7 +88,7 @@ renderGame(state);
 // Shift clock: only real play advances; screenshot scenes stay frozen.
 let lastTimestamp = performance.now();
 function frame(now) {
-  const dt = Math.min(0.05, (now - lastTimestamp) / 1000);
+  const dt = Math.min(0.1, (now - lastTimestamp) / 1000);
   lastTimestamp = now;
   if (state.running && !state.over) {
     tickPot(state.kitchen, dt);
