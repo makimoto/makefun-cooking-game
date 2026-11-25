@@ -34,7 +34,7 @@ export function buildShotScene(name, seed) {
     target.patienceLeft = 24;
     state.orders[1].patienceLeft = 8;
     plateTicket(state, target, 3);
-    state.kitchen.potProgress = 0.55;
+    state.kitchen.potProgress = 0.37; // needle centred in the target's FIRM zone: pull moment is next
     state.feedback = 'One topping to go — then ring the bell!';
     state.feedbackKind = 'good';
   }
@@ -55,15 +55,17 @@ export function buildShotScene(name, seed) {
   }
 
   if (name === 'play') {
-    state.timeLeft = 72; state.elapsed = 18;
-    state.score = 460; state.combo = 1; state.servedCount = 1; state.perfectCount = 1;
-    state.kitchen.pass = [{ label: '#1 shoyu', broth: 'shoyu' }];
-    state.orders.forEach((order, index) => { order.number = 2 + index; });
+    // The payoff moment: the last bowl was PERFECT, the combo is hot, and the
+    // next bowl is already boiling toward its SOFT window.
+    state.timeLeft = 64; state.elapsed = 26;
+    state.score = 1875; state.combo = 5; state.servedCount = 5; state.perfectCount = 4;
+    state.kitchen.pass = [{ label: '#5 tonkotsu', broth: 'tonkotsu' }];
+    state.orders.forEach((order, index) => { order.number = 6 + index; });
     Object.assign(target, { broth: 'miso', doneness: 'soft', toppings: ['narutomaki', 'karamiso', 'corn'] });
     plateTicket(state, target, 2);
     state.kitchen.bowl.noodleDoneness = null;
     state.kitchen.potProgress = 0.73;
-    state.feedback = 'SOFT zone — pull the noodles now!';
+    state.feedback = 'PERFECT BOWL! +412 — combo ×1.75! Next bowl: pull SOFT now!';
     state.feedbackKind = 'good';
   }
 
@@ -81,7 +83,8 @@ export function buildShotScene(name, seed) {
 }
 
 export function shotEndSummary(state) {
-  return `Bowls served: ${state.servedCount} · Perfect bowls: ${state.perfectCount}
-` +
-    `Walked out hungry: ${state.walkedOut} · Final score: ${state.score}`;
+  const accuracy = state.servedCount > 0 ? Math.round((state.perfectCount / state.servedCount) * 100) : 0;
+  const grade = accuracy >= 80 ? 'S' : accuracy >= 60 ? 'A' : accuracy >= 40 ? 'B' : 'C';
+  return `Bowls served: ${state.servedCount} · Perfect bowls: ${state.perfectCount} · Accuracy: ${accuracy}%\n` +
+    `Walked out hungry: ${state.walkedOut} · Final score: ${state.score} · Stall grade: ${grade}`;
 }

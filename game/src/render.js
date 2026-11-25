@@ -1,7 +1,7 @@
 // All DOM rendering: HUD, tickets, pot, bowl and counter buttons. The game
 // state modules never touch the document; everything visual happens here.
 import { BROTHS, TOPPINGS, brothById, toppingById, PLATING_SPOTS } from './config.js';
-import { selectedOrder } from './game.js';
+import { selectedOrder, elapsedRatio } from './game.js';
 
 const el = (id) => document.getElementById(id);
 
@@ -42,6 +42,7 @@ export function renderGame(state) {
   el('score').textContent = String(state.score);
   el('combo').textContent = `×${(1 + 0.15 * Math.min(state.combo, 6)).toFixed(2).replace(/0$/, '')} (${state.combo})`;
   el('served').textContent = String(state.servedCount);
+  el('rush-level').textContent = `RUSH LV ${1 + Math.floor(elapsedRatio(state) * 3.99)}`;
 
   // Tickets
   const tickets = el('tickets');
