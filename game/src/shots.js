@@ -13,7 +13,7 @@ const TICKETS = [
   { pinned: 0, customer: 'Night-bus Driver', broth: 'tonkotsu', doneness: 'firm', toppings: ['chashu', 'negi'], served: 3 },
   { pinned: 0, customer: 'Jazz Pianist', broth: 'shoyu', doneness: 'regular', toppings: ['menma', 'nori'], served: 11 },
   { pinned: 3, customer: 'Taxi Poet', broth: 'shoyu', doneness: 'firm', toppings: ['chashu', 'ajitama'], served: 37, missed: 'ajitama' },
-  { pinned: 11, customer: 'Insomniac Novelist', broth: 'shoyu', doneness: 'soft', toppings: ['negi', 'menma'], served: 40 },
+  { pinned: 11, customer: 'Insomniac Novelist', broth: 'tonkotsu', doneness: 'soft', toppings: ['negi', 'menma'], served: 40 },
   { pinned: 28, customer: 'Night Nurse', broth: 'miso', doneness: 'regular', toppings: ['ajitama', 'corn', 'karamiso'], served: 44 },
   { pinned: 38, customer: 'Street Photographer', broth: 'tonkotsu', doneness: 'regular', toppings: ['chashu', 'ajitama', 'nori'], served: 49 },
   { pinned: 41, customer: 'Late-shift Baker', broth: 'shoyu', doneness: 'firm', toppings: ['menma', 'negi', 'nori'], served: 54 },
