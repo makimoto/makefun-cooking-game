@@ -48,7 +48,6 @@ const handlers = {
     renderGame(state);
   },
   onServe() {
-    if (!state.running) { renderGame(state); return; }
     const result = serveCurrentBowl(state);
     if (result) { sfx.serveBell(); if (result.perfect) setTimeout(() => sfx.perfect(), 150); }
     renderGame(state);

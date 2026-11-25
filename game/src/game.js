@@ -82,6 +82,7 @@ export function tickShift(state, dt, hooks) {
     state.combo = 0;
   }
   if (state.spawnTimer <= 0 && state.orders.length < 3) {
+    if (state.orders.length === 0 && walked.length === 0) state.feedback = '';
     addOrder(state);
     state.spawnTimer = spawnIntervalSeconds(elapsedRatio(state));
     hooks.onNewOrder?.();
@@ -102,10 +103,16 @@ export function tickShift(state, dt, hooks) {
 
 /** Serve the current bowl to the selected ticket. Returns the scoring result or null. */
 export function serveCurrentBowl(state) {
+  if (!state.running || state.over) return null;
   const order = selectedOrder(state);
   if (!order || !state.kitchen.bowl) return null;
   if (!state.kitchen.bowl.broth || !state.kitchen.bowl.noodleDoneness) {
     state.feedback = 'That bowl is not food yet — it needs broth and noodles before it can be served.';
+    state.feedbackKind = 'bad';
+    return null;
+  }
+  if (state.kitchen.bowl.noodleDoneness === 'undercooked') {
+    state.feedback = 'Cook a fresh batch of noodles before serving.';
     state.feedbackKind = 'bad';
     return null;
   }

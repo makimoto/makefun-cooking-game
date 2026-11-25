@@ -67,7 +67,7 @@ export function renderGame(state) {
   const target = selectedOrder(state);
   el('target-name').textContent = target ? `#${target.number} ${brothById(target.broth).name} / ${target.doneness}` : '—';
   const bowl = state.kitchen.bowl;
-  el('serve-btn').classList.toggle('unready', !target || !bowl?.broth || !bowl.noodleDoneness);
+  el('serve-btn').classList.toggle('unready', state.over || !target || !bowl?.broth || !bowl.noodleDoneness || bowl.noodleDoneness === 'undercooked');
   const brothLayer = el('broth');
   brothLayer.className = bowl?.broth ? bowl.broth : '';
   el('bowl-steam').className = bowl?.broth ? 'on' : '';
@@ -100,12 +100,12 @@ export function renderGame(state) {
     el('noodle-btn').innerHTML = '🍜 DROP NOODLES <kbd>Space</kbd>';
   } else {
     marker.style.left = `calc(${Math.min(100, pot.potProgress * 100)}% - 3px)`;
-    const pct = Math.round(pot.potProgress * 100);
+    const pct = Math.floor(pot.potProgress * 100);
     el('boil-status').textContent = pot.potProgress < 0.3 ? `Boiling… ${pct}% — too firm still`
       : pot.potProgress < 0.45 ? `Boiling… ${pct}% — FIRM zone!`
       : pot.potProgress < 0.65 ? `Boiling… ${pct}% — REGULAR zone!`
       : pot.potProgress < 0.8 ? `Boiling… ${pct}% — SOFT zone!`
-      : `Boiling… ${pct}% — SOGGY! Pull now or trash it`;
+      : `Boiling… ${pct}% — SOGGY! Pull to clear the pot`;
     el('noodle-btn').innerHTML = '🥢 PULL NOODLES <kbd>Space</kbd>';
   }
 

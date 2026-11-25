@@ -20,6 +20,11 @@ export function bindKeyboard(handlers) {
   window.addEventListener('keydown', (event) => {
     if (event.repeat) return;
     const key = event.key.toLowerCase();
+    if (!document.getElementById('overlay').classList.contains('hidden')) {
+      if ((key === ' ' || key === 'enter') && event.target.id !== 'overlay-btn') event.preventDefault();
+      return;
+    }
+    if ((key === ' ' || key === 'enter') && event.target.closest?.('button')) return;
     if (key === ' ') { event.preventDefault(); handlers.onNoodleAction(); return; }
     if (key === 'enter') { event.preventDefault(); handlers.onServe(); return; }
     if (key === 'b') { handlers.onNewBowl(); return; }
