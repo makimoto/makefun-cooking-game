@@ -4,8 +4,8 @@
 export const SHIFT_SECONDS = 90;
 
 export const BROTHS = [
-  { id: 'shoyu',    name: 'Shoyu',    jp: '醤油', color: '#5d3a17', key: 'q', blurb: 'clear soy' },
-  { id: 'miso',     name: 'Miso',     jp: '味噌', color: '#9c6527', key: 'w', blurb: 'rich fermented' },
+  { id: 'shoyu',    name: 'Shoyu',    jp: '醤油', color: '#54251e', key: 'q', blurb: 'clear soy' },
+  { id: 'miso',     name: 'Miso',     jp: '味噌', color: '#d88828', key: 'w', blurb: 'rich fermented' },
   { id: 'tonkotsu', name: 'Tonkotsu', jp: '豚骨', color: '#d9bd8d', key: 'e', blurb: 'creamy pork' },
 ];
 

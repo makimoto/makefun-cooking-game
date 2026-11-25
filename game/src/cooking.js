@@ -6,7 +6,7 @@ export function createKitchenState() {
   return {
     bowl: null,            // { broth: string|null, noodleDoneness: string|null, toppings: string[] }
     potProgress: null,     // null = pot empty, otherwise 0..1+ boil progress
-    pass: [],              // finished bowls waiting on the pass shelf {label, broth}
+    pass: [],              // last three bowls served {label, broth}
   };
 }
 

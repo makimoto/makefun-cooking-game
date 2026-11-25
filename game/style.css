@@ -100,8 +100,8 @@ kbd { background: #0e0a1e; border: 1px solid #777; border-bottom-width: 3px; bor
   box-shadow: inset 0 -18px 30px rgba(0,0,0,.25); }
 #bowl-shadow { position: absolute; bottom: 22px; width: 300px; height: 26px; background: rgba(0,0,0,.45); border-radius: 50%; filter: blur(4px); z-index: -1; }
 #broth { position: absolute; left: 6%; right: 6%; top: 4px; height: 74px; border-radius: 50%; background: #4a3421; transition: background .3s; }
-#broth.shoyu { background: radial-gradient(ellipse at 50% 40%, #6e4520, #38220e); }
-#broth.miso { background: radial-gradient(ellipse at 50% 40%, #e8ac55, #b57a24); }
+#broth.shoyu { background: radial-gradient(ellipse at 50% 40%, #71382b, #391711); }
+#broth.miso { background: radial-gradient(ellipse at 50% 40%, #f3ac45, #bc691c); }
 #broth.tonkotsu { background: radial-gradient(ellipse at 50% 40%, #f3e3c2, #d9bd8d); }
 #noodle-layer { position: absolute; left: 16%; right: 16%; top: 16px; height: 52px; border-radius: 50%; opacity: 0;
   background: repeating-radial-gradient(ellipse at 50% 50%, #ffe9a8 0 5px, #f2c94c 5px 9px); transition: opacity .3s; }
@@ -191,12 +191,12 @@ kbd { background: #0e0a1e; border: 1px solid #777; border-bottom-width: 3px; bor
   margin-top: 3px;
   padding: 2px 7px;
   border-radius: 4px;
-  background: #673321;
+  background: #54251e;
   color: #fff7e6;
 }
 .ticket-order strong { font-size: 20px; }
 .ticket-order span { font-size: 12px; font-weight: 800; }
-.ticket-miso { background: #8c4d27; }
+.ticket-miso { background: #d88828; color: #321b0d; }
 .ticket-tonkotsu { background: #efd293; color: #452b1a; }
 .panel {
   background: repeating-linear-gradient(0deg, transparent 0 34px, #11090144 34px 36px, #eeb78214 36px 37px),

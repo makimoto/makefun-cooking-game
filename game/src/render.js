@@ -85,9 +85,16 @@ export function renderGame(state) {
 
   // Target line + bowl
   const target = selectedOrder(state);
-  el('target-name').textContent = target ? `#${target.number} ${brothById(target.broth).name} / ${target.doneness}` : '—';
-  const bowl = state.kitchen.bowl;
-  el('serve-btn').classList.toggle('unready', state.over || !target || !bowl?.broth || !bowl.noodleDoneness || bowl.noodleDoneness === 'undercooked');
+  const activeBowl = state.kitchen.bowl;
+  const preview = state.servedBowlPreview;
+  const displayedOrder = preview ? state.lastServe.order : target;
+  el('target-label').textContent = preview ? 'Last served' : 'Target';
+  el('target-name').textContent = displayedOrder
+    ? `#${displayedOrder.number} ${brothById(displayedOrder.broth).name} / ${displayedOrder.doneness}`
+    : '—';
+  el('serve-btn').classList.toggle('unready', state.over || !target || !activeBowl?.broth
+    || !activeBowl.noodleDoneness || activeBowl.noodleDoneness === 'undercooked');
+  const bowl = preview || activeBowl;
   const brothLayer = el('broth');
   brothLayer.className = bowl?.broth ? bowl.broth : '';
   el('bowl-steam').className = bowl?.broth ? 'on' : '';
