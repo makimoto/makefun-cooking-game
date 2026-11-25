@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umami Rush — Midnight Ramen Stand</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stall">
+  <header id="hud">
+    <div class="brand">
+      <div class="lantern">麺</div>
+      <div>
+        <h1>UMAMI RUSH</h1>
+        <p>Midnight Ramen Stand</p>
+      </div>
+    </div>
+    <div class="hud-box" id="shift-box">
+      <span class="hud-label">SHIFT TIMER</span>
+      <span id="shift-time">90</span>
+      <div class="meter"><div id="shift-meter"></div></div>
+    </div>
+    <div class="hud-box"><span class="hud-label">SCORE</span><span id="score">0</span></div>
+    <div class="hud-box"><span class="hud-label">COMBO</span><span id="combo">×1</span></div>
+    <div class="hud-box"><span class="hud-label">SERVED</span><span id="served">0</span></div>
+    <button id="start-btn">▶ OPEN STALL</button>
+  </header>
+
+  <section id="order-board">
+    <div class="board-title">📋 ORDER BOARD <span>click a ticket, build that bowl</span></div>
+    <div id="tickets"></div>
+  </section>
+
+  <main id="work-area">
+    <section id="pot-station" class="panel">
+      <h2>🍲 NOODLE POT</h2>
+      <div id="pot">
+        <div class="steam s1"></div><div class="steam s2"></div><div class="steam s3"></div>
+        <div id="pot-water"><div id="pot-noodles"></div></div>
+        <div class="pot-rim"></div>
+      </div>
+      <div id="boil-track">
+        <div class="zone zone-under"></div>
+        <div class="zone zone-firm"></div>
+        <div class="zone zone-regular"></div>
+        <div class="zone zone-soft"></div>
+        <div class="zone zone-over"></div>
+        <div id="boil-marker"></div>
+      </div>
+      <div id="boil-labels"><span>drop</span><span>FIRM</span><span>REGULAR</span><span>SOFT</span><span>soggy…</span></div>
+      <div id="boil-status">Pot is empty. Drop noodles!</div>
+      <button id="noodle-btn" class="big-btn">🍜 DROP NOODLES <kbd>Space</kbd></button>
+      <div id="pass-shelf">
+        <h3>PASS — READY TO SERVE</h3>
+        <div id="pass-bowls"></div>
+      </div>
+    </section>
+
+    <section id="assembly" class="panel">
+      <h2>🥣 ASSEMBLY COUNTER</h2>
+      <div id="target-line">Target: <b id="target-name">—</b></div>
+      <div id="bowl-stage">
+        <div id="bowl">
+          <div id="broth"></div>
+          <div id="noodle-layer"></div>
+          <div id="topping-layer"></div>
+          <div class="bowl-shine"></div>
+        </div>
+        <div id="bowl-shadow"></div>
+      </div>
+      <div id="bowl-status">Take a fresh bowl to start.</div>
+      <div class="row-btns">
+        <button id="bowl-btn" class="big-btn">🥣 NEW BOWL <kbd>B</kbd></button>
+        <button id="trash-btn" class="big-btn danger">🗑 TRASH <kbd>T</kbd></button>
+      </div>
+      <button id="serve-btn">🔔 SERVE BOWL <kbd>Enter</kbd></button>
+      <div id="feedback"></div>
+    </section>
+
+    <section id="counter" class="panel">
+      <h2>🧺 INGREDIENT COUNTER</h2>
+      <h3>Soup — ladle one</h3>
+      <div id="soup-row"></div>
+      <h3>Toppings — click to plate</h3>
+      <div id="topping-grid"></div>
+      <p class="hint">Keys: <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> ticket · <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> soup ·
+      <kbd>Space</kbd> noodles · <kbd>A</kbd>–<kbd>H</kbd> toppings · <kbd>Enter</kbd> serve</p>
+    </section>
+  </main>
+
+  <div id="overlay" class="hidden">
+    <div id="overlay-card">
+      <h2 id="overlay-title">UMAMI RUSH</h2>
+      <p id="overlay-text"></p>
+      <button id="overlay-btn">START SHIFT</button>
+    </div>
+  </div>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
