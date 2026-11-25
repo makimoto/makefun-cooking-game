@@ -5,9 +5,9 @@ import {
   takeFreshBowl, trashBowl, ladleBroth, addToppingToBowl,
   dropNoodlesInPot, pullNoodlesFromPot, tickPot,
 } from './cooking.js';
-import { buildCounterButtons, renderGame, showOverlay, hideOverlay } from './render.js';
+import { buildCounterButtons, renderGame, showOverlay, hideOverlay, renderResults } from './render.js';
 import { bindKeyboard, bindTicketClicks, blurButtonsAfterClick } from './input.js';
-import { buildShotScene, shotEndSummary } from './shots.js';
+import { buildShotScene } from './shots.js';
 import { sfx } from './audio.js';
 
 const params = new URLSearchParams(location.search);
@@ -21,18 +21,26 @@ let state = shotName
 
 const handlers = {
   onBroth(brothId) {
+    if (state.paused) return;
+    state.perfectBanner = false;
     if (!state.kitchen.bowl) takeFreshBowl(state.kitchen);
     if (ladleBroth(state.kitchen, brothId)) { sfx.ladle(); state.feedback = ''; }
     renderGame(state);
   },
   onTopping(toppingId) {
+    if (state.paused) return;
+    state.perfectBanner = false;
     if (!state.kitchen.bowl) takeFreshBowl(state.kitchen);
     if (addToppingToBowl(state.kitchen, toppingId)) sfx.plate();
     renderGame(state);
   },
-  onNewBowl() { takeFreshBowl(state.kitchen); sfx.click(); renderGame(state); },
-  onTrash() { trashBowl(state.kitchen); sfx.trash(); renderGame(state); },
+  onNewBowl() {
+    if (state.paused) return; state.perfectBanner = false; takeFreshBowl(state.kitchen); sfx.click(); renderGame(state); },
+  onTrash() {
+    if (state.paused) return; state.perfectBanner = false; trashBowl(state.kitchen); sfx.trash(); renderGame(state); },
   onNoodleAction() {
+    if (state.paused) return;
+    state.perfectBanner = false;
     if (state.kitchen.potProgress === null) {
       if (dropNoodlesInPot(state.kitchen)) sfx.dropNoodles();
     } else {
@@ -48,7 +56,9 @@ const handlers = {
     renderGame(state);
   },
   onServe() {
+    if (state.paused) return;
     const result = serveCurrentBowl(state);
+    state.perfectBanner = Boolean(result?.perfect);
     if (result) { sfx.serveBell(); if (result.perfect) setTimeout(() => sfx.perfect(), 150); }
     renderGame(state);
   },
@@ -74,11 +84,20 @@ function beginShift() {
   hideOverlay();
   renderGame(state);
 }
-document.getElementById('start-btn').addEventListener('click', beginShift);
+// Mid-shift the header button pauses/resumes; otherwise it opens the stall.
+document.getElementById('start-btn').addEventListener('click', () => {
+  if (!state.over && (state.running || state.orders.length > 0)) {
+    state.paused = !state.paused;
+    renderGame(state);
+  } else {
+    beginShift();
+  }
+});
 document.getElementById('overlay-btn').addEventListener('click', beginShift);
 
 if (shotName === 'end') {
-  showOverlay('🌙 SHIFT OVER', shotEndSummary(state), 'PLAY AGAIN', true);
+  showOverlay('🌙 SHIFT OVER', 'Last train gone. The night owls are fed.', 'PLAY AGAIN', true);
+  renderResults(state);
 } else if (!shotName) {
   showOverlay('🍜 UMAMI RUSH — Midnight Ramen Stand',
     'Ninety seconds, one steaming pot, a board full of hungry night owls.\nMatch each ticket: broth, noodle doneness, every topping.\nPull the noodles inside the ticket\'s zone — perfect bowls build your combo.',
@@ -91,14 +110,15 @@ let lastTimestamp = performance.now();
 function frame(now) {
   const dt = Math.min(0.1, (now - lastTimestamp) / 1000);
   lastTimestamp = now;
-  if (state.running && !state.over) {
+  if (state.running && !state.paused && !state.over) {
     tickPot(state.kitchen, dt);
     tickShift(state, dt, {
       onWalkout() { sfx.walkout(); },
       onShiftEnd() {
         showOverlay('🌙 SHIFT OVER',
-          shotEndSummary(state),
+          'Last train gone. The night owls are fed.',
           'PLAY AGAIN', true);
+        renderResults(state);
       },
     });
     renderGame(state);

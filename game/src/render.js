@@ -37,11 +37,31 @@ function ticketHtml(order) {
     <div class="patience"><div style="width:${pct}%"></div></div>`;
 }
 
+function comboMultiplier(state) {
+  return (1 + 0.15 * Math.min(state.combo, 6)).toFixed(2).replace(/0$/, '');
+}
+
 export function renderGame(state) {
+  // The header button starts the stall before a shift, then becomes the
+  // pause/resume control while a shift is on — it never offers "OPEN STALL"
+  // in the middle of service.
+  const startBtn = el('start-btn');
+  const inShift = !state.over && (state.running || state.orders.length > 0);
+  startBtn.textContent = inShift ? (state.paused ? '▶ RESUME' : '⏸ PAUSE') : '▶ OPEN STALL';
+
+  // Big celebration pop over the bowl right after a perfect serve.
+  const pop = el('perfect-pop');
+  if (state.perfectBanner) {
+    pop.classList.remove('hidden');
+    pop.querySelector('.perfect-sub').textContent = `COMBO ×${comboMultiplier(state)} (${state.combo})`;
+  } else {
+    pop.classList.add('hidden');
+  }
+
   el('shift-time').textContent = String(Math.ceil(state.timeLeft));
   el('shift-meter').style.width = `${(state.timeLeft / 90) * 100}%`;
   el('score').textContent = String(state.score);
-  el('combo').textContent = `×${(1 + 0.15 * Math.min(state.combo, 6)).toFixed(2).replace(/0$/, '')} (${state.combo})`;
+  el('combo').textContent = `×${comboMultiplier(state)} (${state.combo})`;
   el('served').textContent = String(state.servedCount);
   el('rush-level').textContent = `RUSH LV ${1 + Math.floor(elapsedRatio(state) * 3.99)}`;
 
@@ -140,7 +160,61 @@ export function showOverlay(title, text, buttonLabel, isResults = false) {
   el('overlay-title').textContent = title;
   el('overlay-text').textContent = text;
   el('overlay-btn').textContent = buttonLabel;
+  el('overlay-extra').classList.add('hidden');
+  el('overlay-extra').innerHTML = '';
   el('overlay').classList.toggle('results', isResults);
   el('overlay').classList.remove('hidden');
+}
+
+/**
+ * Full-screen closing report for the results overlay: the grade up top, the
+ * night's numbers as stat chips, the last bowls on the pass, what is left on
+ * the board, and the counter's toppings — the whole shift at a glance, with
+ * nothing of the live game showing behind it.
+ */
+export function renderResults(state) {
+  const accuracy = state.servedCount > 0 ? Math.round((state.perfectCount / state.servedCount) * 100) : 0;
+  const grade = accuracy >= 80 ? 'S' : accuracy >= 60 ? 'A' : accuracy >= 40 ? 'B' : 'C';
+  const pinned = state.servedCount + state.walkedOut + state.orders.length;
+  const chip = (label, value) => `<div class="stat-chip"><span>${label}</span><b>${value}</b></div>`;
+  const passBowls = state.kitchen.pass.map((p) =>
+    `<div class="pass-bowl">
+      <div class="mini-bowl" aria-hidden="true"><span class="mini-steam"></span>
+        <div class="mini-broth" style="background-color:${brothById(p.broth).color}"></div>
+      </div>
+      <span>${p.label}</span>
+    </div>`).join('');
+  const leftTickets = state.orders.map((order) =>
+    `<span class="recap-ticket">#${order.number} ${brothById(order.broth).name}</span>`).join('');
+  const counterChips = TOPPINGS.map((t) =>
+    `<span class="chip top-${t.id} recap-chip">${t.short}</span>`).join('');
+  el('overlay-extra').innerHTML = `
+    <div class="results-grade"><span>STALL GRADE</span><b>${grade}</b></div>
+    <div class="stat-chips">
+      ${chip('FINAL SCORE', state.score)}
+      ${chip('BOWLS SERVED', state.servedCount)}
+      ${chip('PERFECT BOWLS', state.perfectCount)}
+      ${chip('ACCURACY', `${accuracy}%`)}
+      ${chip('WALKED OUT', state.walkedOut)}
+      ${chip('BEST COMBO', `×${(1 + 0.15 * Math.min(state.bestCombo, 6)).toFixed(2).replace(/0$/, '')}`)}
+      ${chip('SHIFT TIMER', '0:00 — TIME UP')}
+    </div>
+    <div class="recap-row">
+      <div class="recap-panel">
+        <h3>PASS — LAST BOWLS OUT</h3>
+        <div class="recap-pass">${passBowls}</div>
+      </div>
+      <div class="recap-panel">
+        <h3>ORDER BOARD — CLOSED</h3>
+        <p>${pinned} tickets pinned tonight · ${state.servedCount} served · ${state.walkedOut} walked out</p>
+        <p>Left on the board: ${leftTickets || 'none — every owl fed'}</p>
+      </div>
+      <div class="recap-panel">
+        <h3>FROM THE COUNTER</h3>
+        <div class="recap-counter">${counterChips}</div>
+        <p>3 broths · 8 toppings · one steaming pot</p>
+      </div>
+    </div>`;
+  el('overlay-extra').classList.remove('hidden');
 }
 export function hideOverlay() { el('overlay').classList.add('hidden'); }

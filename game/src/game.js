@@ -18,6 +18,8 @@ export function createShiftState(rng) {
   return {
     rng,
     running: false,
+    paused: false,
+    perfectBanner: false,
     over: false,
     timeLeft: SHIFT_SECONDS,
     elapsed: 0,
@@ -51,6 +53,8 @@ export function addOrder(state) {
 
 export function startShift(state) {
   state.running = true;
+  state.paused = false;
+  state.perfectBanner = false;
   state.orders = [];
   addOrder(state); addOrder(state);
   state.spawnTimer = spawnIntervalSeconds(0);

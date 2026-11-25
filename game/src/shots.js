@@ -1,6 +1,8 @@
 // Deterministic screenshot scenes, reached with ?shot=<name>&seed=<n>.
-// Each scene builds a real mid-shift state with the game's own rules — the
-// same orders, pot and bowl a player would see — then freezes the clock so
+// The four scenes are one single shift told in order — cover, serve, play,
+// end — so the clock only ever runs down and the score, bowls served and
+// perfect count only ever climb from frame to frame. Each scene builds a
+// real mid-shift state with the game's own rules, then freezes the clock so
 // the camera captures a stable, honest frame of the game.
 import { createSeededRng, createShiftState, startShift, selectOrder, addOrder } from './game.js';
 import { takeFreshBowl, ladleBroth, addToppingToBowl } from './cooking.js';
@@ -22,65 +24,85 @@ export function buildShotScene(name, seed) {
 
   const target = state.orders[0];
   if (name === 'cover') {
-    state.timeLeft = 58; state.elapsed = 32;
-    state.score = 1240; state.combo = 3; state.servedCount = 4; state.perfectCount = 3;
+    // 18 seconds in: two bowls out, ticket #3 on the counter with its
+    // noodles still bubbling in the FIRM zone, and #4 about to walk.
+    state.timeLeft = 72; state.elapsed = 18;
+    state.score = 640; state.combo = 2; state.bestCombo = 2;
+    state.servedCount = 2; state.perfectCount = 2; state.walkedOut = 0;
     state.kitchen.pass = [
-      { label: '#3 tonkotsu', broth: 'tonkotsu' },
-      { label: '#4 shoyu', broth: 'shoyu' },
+      { label: '#1 tonkotsu', broth: 'tonkotsu' },
+      { label: '#2 shoyu', broth: 'shoyu' },
     ];
     addOrder(state);
-    state.orders.forEach((order, index) => { order.number = 5 + index; });
-    Object.assign(target, { broth: 'shoyu', doneness: 'firm', toppings: ['chashu', 'ajitama', 'nori'], patience: 36, patienceLeft: 31 });
+    state.orders.forEach((order, index) => { order.number = 3 + index; });
+    Object.assign(target, { broth: 'shoyu', doneness: 'firm', toppings: ['chashu', 'ajitama', 'nori'], patience: 36, patienceLeft: 30 });
     Object.assign(state.orders[1], { toppings: ['negi', 'ajitama', 'menma'], patience: 36, patienceLeft: 8 });
     plateTicket(state, target, 2);
+    state.kitchen.bowl.noodleDoneness = null; // still in the pot, not yet pulled
     state.kitchen.potProgress = 0.375;
     state.feedback = 'One topping to go — then ring the bell!';
     state.feedbackKind = 'good';
   }
 
   if (name === 'serve') {
-    state.timeLeft = 41; state.elapsed = 49;
-    state.score = 2315; state.combo = 5; state.servedCount = 7; state.perfectCount = 5;
-    state.kitchen.pass = [{ label: '#7 miso', broth: 'miso' }];
-    state.orders.forEach((order, index) => { order.number = 8 + index; });
+    // 44 seconds in: five bowls out, ticket #6 finished and steaming on the
+    // counter, two more tickets already pinned behind it.
+    state.timeLeft = 46; state.elapsed = 44;
+    state.score = 1620; state.combo = 4; state.bestCombo = 4;
+    state.servedCount = 5; state.perfectCount = 4; state.walkedOut = 0;
+    state.kitchen.pass = [
+      { label: '#3 shoyu', broth: 'shoyu' },
+      { label: '#4 miso', broth: 'miso' },
+      { label: '#5 tonkotsu', broth: 'tonkotsu' },
+    ];
+    addOrder(state);
+    state.orders.forEach((order, index) => { order.number = 6 + index; });
     Object.assign(target, {
       broth: 'tonkotsu',
+      doneness: 'regular',
       toppings: ['chashu', 'ajitama', 'nori'],
       patience: 34,
       patienceLeft: 28,
     });
-    Object.assign(state.orders[1], { toppings: ['corn', 'negi', 'karamiso'], patience: 34, patienceLeft: 31 });
+    Object.assign(state.orders[1], { toppings: ['corn', 'negi', 'karamiso'], patience: 34, patienceLeft: 20 });
     plateTicket(state, target);
     state.feedback = 'Bowl complete — hit SERVE while it steams!';
     state.feedbackKind = 'good';
   }
 
   if (name === 'play') {
-    // The payoff moment: the last bowl was PERFECT, the combo is hot, and the
-    // next bowl is already boiling toward its SOFT window.
-    state.timeLeft = 64; state.elapsed = 26;
-    state.score = 2360; state.combo = 5; state.servedCount = 5; state.perfectCount = 5;
-    state.kitchen.pass = [{ label: '#5 tonkotsu', broth: 'tonkotsu' }];
-    state.orders.forEach((order, index) => { order.number = 6 + index; });
-    Object.assign(target, { broth: 'miso', doneness: 'soft', toppings: ['narutomaki', 'corn'], patience: 37, patienceLeft: 34 });
-    Object.assign(state.orders[1], { patience: 37, patienceLeft: 36 });
-    plateTicket(state, target);
-    state.kitchen.bowl.noodleDoneness = null;
-    state.kitchen.potProgress = 0.73;
-    state.feedback = 'PERFECT BOWL! +592 — combo ×1.75! Next bowl: pull SOFT now!';
+    // 67 seconds in: ticket #8 just flew out PERFECT and the banner is still
+    // up, while bowl #9 is already plated — noodles pulled SOFT, one
+    // topping to go — under the late-shift rush.
+    state.timeLeft = 23; state.elapsed = 67;
+    state.score = 2590; state.combo = 6; state.bestCombo = 6;
+    state.servedCount = 8; state.perfectCount = 6; state.walkedOut = 1;
+    state.kitchen.pass = [
+      { label: '#6 shoyu', broth: 'shoyu' },
+      { label: '#7 miso', broth: 'miso' },
+      { label: '#8 tonkotsu', broth: 'tonkotsu' },
+    ];
+    state.orders.forEach((order, index) => { order.number = 9 + index; });
+    Object.assign(target, { broth: 'miso', doneness: 'soft', toppings: ['narutomaki', 'corn', 'negi'], patience: 37, patienceLeft: 30 });
+    Object.assign(state.orders[1], { patience: 37, patienceLeft: 35 });
+    plateTicket(state, target, 2);
+    state.perfectBanner = true;
+    state.feedback = 'PERFECT BOWL! +592 — #8 flew out. This one needs negi, then serve!';
     state.feedbackKind = 'good';
   }
 
   if (name === 'end') {
+    // Time up: eleven bowls served, eight of them perfect (73% — a solid A,
+    // not a gift), two owls walked out, two tickets still on the board.
     state.timeLeft = 0; state.elapsed = 90; state.over = true;
-    state.score = 3480; state.servedCount = 11; state.perfectCount = 7;
-    state.walkedOut = 2;
-    state.kitchen.pass = [{ label: '#12 shoyu', broth: 'shoyu' }, { label: '#13 miso', broth: 'miso' }];
-    state.orders.pop();
-    addOrder(state).patienceLeft = 22;
+    state.score = 3540; state.combo = 0; state.bestCombo = 6;
+    state.servedCount = 11; state.perfectCount = 8; state.walkedOut = 2;
+    state.kitchen.pass = [
+      { label: '#9 shoyu', broth: 'shoyu' },
+      { label: '#10 miso', broth: 'miso' },
+      { label: '#11 tonkotsu', broth: 'tonkotsu' },
+    ];
     state.orders.forEach((order, index) => { order.number = 14 + index; });
-    Object.assign(target, { broth: 'miso', toppings: ['ajitama', 'nori', 'corn', 'karamiso'], patience: 30, patienceLeft: 11 });
-    plateTicket(state, target, 3);
     state.feedback = 'Last train gone. The night owls are fed.';
   }
   return state;
